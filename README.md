@@ -1,4 +1,4 @@
-# IDRR_data (Deprecated. Please use [this repo: IDRR_data](https://github.com/IDRR-Research-Group-Soochow-University/IDRR_data))
+# IDRR_data
 
 The data of IDRR (Implicit Discourse Relation Recognition), including PDTB2, PDTB3 and CoNLL16. 
 

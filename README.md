@@ -36,8 +36,8 @@ pip install -e .
 
 1. connXsenseY -> labelXY, labelXYid
 2. connX -> ans_wordX, ans_wordXid
-3. filter relation ['Explicit', 'Implicit']
-4. filter split ['train', 'dev', 'test', 'blind-test']
+3. relation ['Explicit', 'Implicit']
+4. split ['train', 'dev', 'test', 'blind-test']
 
 
 ## Raw Resource

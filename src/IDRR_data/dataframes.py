@@ -3,11 +3,81 @@ import re
 import json
 import pandas as pd
 import numpy as np
+import dataclasses
 
 from typing import *
 from .label_list import TOP_LEVEL_LABEL_LIST, SEC_LEVEL_LABEL_LIST
 from .ans_word_map import ANS_WORD_LIST, ANS_LABEL_LIST, SUBTYPE_LABEL2ANS_WORD
 from .words2token_ids import words2token_ids
+
+
+_IDRR_DATA_OLD_KEYS = [
+    'arg1', 'arg2', 'conn1', 'conn2', 
+    'conn1sense1', 'conn1sense2', 'conn2sense1', 'conn2sense2', 
+    'relation', 'split', 'data_id', 
+]
+_IDRR_DATA_NEW_KEYS = [
+    'label11', 'label11id', 'label12', 'label12id', 
+    'label21', 'label21id', 'label22', 'label22id', 
+    'ans_word1', 'ans_word1id', 'ans_word2', 'ans_word2id',
+]
+_IDRR_DATA_ALL_KEYS = _IDRR_DATA_OLD_KEYS+_IDRR_DATA_NEW_KEYS
+
+@dataclasses.dataclass
+class IDRRDataSample:
+    arg1: str
+    arg2: str
+    conn1: str
+    conn2: str
+    conn1sense1: str
+    conn1sense2: str
+    conn2sense1: str
+    conn2sense2: str
+    relation: str
+    split: str
+    data_id: int
+    label11: str
+    label11id: int
+    label12: str
+    label12id: int
+    label21: str
+    label21id: int
+    label22: str
+    label22id: int
+    ans_word1: str
+    ans_word1id: int
+    ans_word2: str
+    ans_word2id: int
+
+    @classmethod
+    def load_series(cls, data_series:pd.Series):
+        def _get_val(_k):
+            _v = data_series[_k]
+            return None if pd.isna(_v) else _v
+        return cls( **{_k:_get_val(_k) for _k in _IDRR_DATA_ALL_KEYS} )
+    
+    @property
+    def dic(self): return dataclasses.asdict(self)
+    
+    @property
+    def dict(self): return self.dic
+
+
+class IDRRDataIter:
+    def __init__(self, IDRR_df:pd.DataFrame):
+        self.IDRR_df = IDRR_df
+    
+    def __len__(self):
+        return self.IDRR_df.shape[0]
+
+    def __getitem__(self, index) -> IDRRDataSample:
+        if not 0 <= index < len(self): return
+        return IDRRDataSample.load_series(self.IDRR_df.iloc[index])
+
+    def __iter__(self):
+        def func():
+            for i in range(len(self)): yield self[i]
+        return func()
 
 
 """
@@ -21,7 +91,8 @@ process:
     relation: filter
     split: filter
 processed columns:
-    'index', 'arg1', 'arg2', 'conn1', 'conn2', 
+    # 'index', 
+    'arg1', 'arg2', 'conn1', 'conn2', 
     'conn1sense1', 'conn1sense2', 'conn2sense1', 'conn2sense2', 
     'relation', 'split', 'data_id', 
     'label11', 'label11id', 'label12', 'label12id', 
@@ -58,6 +129,14 @@ class IDRRDataFrames:
         self.data_path = data_path
         self.df = pd.read_csv(data_path, low_memory=False)
     
+    @classmethod
+    def del_new_columns(cls, df:'pd.DataFrame'):
+        return df.drop(columns=cls.new_columns, errors='ignore')
+
+    # =================================================================
+    # Dict, Str
+    # =================================================================
+
     @property
     def json_dic(self):
         dic = {
@@ -76,11 +155,6 @@ class IDRRDataFrames:
     def __repr__(self):
         return f'{self.data_name}_{self.data_level}_{self.data_relation}'
     
-    @classmethod
-    def del_new_columns(cls, df:'pd.DataFrame'):
-        return df.drop(columns=cls.new_columns, errors='ignore')
-
-        
     # =================================================================
     # Dataframe
     # =================================================================
@@ -113,18 +187,24 @@ class IDRRDataFrames:
     @property
     def train_df(self) -> pd.DataFrame:
         return self.get_dataframe('train')
-    
     @property
     def dev_df(self) -> pd.DataFrame:
         return self.get_dataframe('dev')
-        
     @property
     def test_df(self) -> pd.DataFrame:
         return self.get_dataframe('test')
-    
     @property
     def all_df(self) -> pd.DataFrame:
         return self.get_dataframe('all')
+    
+    @property
+    def train_di(self): return IDRRDataIter(self.train_df)
+    @property
+    def dev_di(self): return IDRRDataIter(self.dev_df)
+    @property
+    def test_di(self): return IDRRDataIter(self.test_df)
+    @property
+    def all_di(self): return IDRRDataIter(self.all_df)
             
     # =================================================================
     # Label

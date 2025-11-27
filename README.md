@@ -9,6 +9,9 @@ cd IDRR_data
 pip install -e .
 ~~~
 
+Check the example in [this Notebook](src/-idrr_data.ipynb).
+
+
 ## Data
 
 * columns of csv

@@ -54,7 +54,12 @@ class IDRRDataSample:
         def _get_val(_k):
             _v = data_series[_k]
             return None if pd.isna(_v) else _v
-        return cls( **{_k:_get_val(_k) for _k in _IDRR_DATA_ALL_KEYS} )
+        cls_kwargs = {_k:_get_val(_k) for _k in _IDRR_DATA_OLD_KEYS}
+        if 'label11' in data_series:
+            for _k in _IDRR_DATA_NEW_KEYS: cls_kwargs[_k] = _get_val(_k)
+        else:
+            for _k in _IDRR_DATA_NEW_KEYS: cls_kwargs[_k] = None
+        return cls( **cls_kwargs )
     
     @property
     def dic(self): return dataclasses.asdict(self)

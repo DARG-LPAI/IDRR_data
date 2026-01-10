@@ -202,6 +202,8 @@ class IDRRDataFrames:
     def all_df(self) -> pd.DataFrame:
         return self.get_dataframe('all')
     
+    def get_dataiter(self, split=Literal['train', 'dev', 'test', 'all', 'raw']) -> IDRRDataIter:
+        return IDRRDataIter(self.get_dataframe(split))
     @property
     def train_di(self): return IDRRDataIter(self.train_df)
     @property

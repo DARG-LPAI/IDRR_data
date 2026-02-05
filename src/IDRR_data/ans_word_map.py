@@ -256,6 +256,12 @@ SUBTYPE_LABEL2ANS_WORD ={
         "Temporal.Asynchronous.Precedence": "then",
         "Temporal.Asynchronous.Succession": "previously",
         "Temporal.Synchronous": "simultaneously",
+
+        # New Added
+        "Comparison": "but",
+        "Contingency": "because",
+        "Expansion": "and",
+        "Temporal": "then",
     },
     "conll": {
         "Comparison.Concession": "although",

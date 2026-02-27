@@ -164,7 +164,7 @@ class IDRRDataFrames:
     # Dataframe
     # =================================================================
     
-    def get_dataframe(self, split=Literal['train', 'dev', 'test', 'all', 'raw']) -> pd.DataFrame:
+    def get_dataframe(self, split=Literal['train', 'dev', 'test', 'blind-test', 'all', 'raw']) -> pd.DataFrame:
         if self.df is None:
             self.load_df(self.data_path)
         df = self.df.copy(deep=True)
@@ -173,7 +173,7 @@ class IDRRDataFrames:
             df = df[df['relation']==self.data_relation]
         # split
         split = split.lower()
-        assert split in ['train', 'dev', 'test', 'all', 'raw']
+        assert split in ['train', 'dev', 'test', 'blind-test', 'all', 'raw']
         if split == 'raw':
             pass
         elif split == 'all':
